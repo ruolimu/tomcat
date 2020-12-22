@@ -84,8 +84,7 @@ public interface Lifecycle {
 
 
     // ----------------------------------------------------- Manifest Constants
-
-
+    // 清单常数 定义各种EVENT事件
     /**
      * The LifecycleEvent type for the "component before init" event.
      */
@@ -174,6 +173,8 @@ public interface Lifecycle {
 
 
     /**
+     *  注册一个 LifecycleListener
+     *
      * Add a LifecycleEvent listener to this component.
      *
      * @param listener The listener to add
@@ -182,6 +183,8 @@ public interface Lifecycle {
 
 
     /**
+     * 获取所有注册的 LifecycleListener
+     *
      * Get the life cycle listeners associated with this life cycle.
      *
      * @return An array containing the life cycle listeners associated with this
@@ -192,6 +195,8 @@ public interface Lifecycle {
 
 
     /**
+     * 移除指定的 LifecycleListener
+     *
      * Remove a LifecycleEvent listener from this component.
      *
      * @param listener The listener to remove
@@ -200,6 +205,8 @@ public interface Lifecycle {
 
 
     /**
+     * 组件被实例化之后，调用该方法完成初始化工作，发会出 INIT_EVENT 事件：
+     *
      * Prepare the component for starting. This method should perform any
      * initialization required post object creation. The following
      * {@link LifecycleEvent}s will be fired in the following order:
@@ -214,6 +221,8 @@ public interface Lifecycle {
     public void init() throws LifecycleException;
 
     /**
+     * 在组件投入使用之前调用该方法，先后会发出以下事件：BEFORE_START_EVENT、START_EVENT、AFTER_START_EVENT
+     *
      * Prepare for the beginning of active use of the public methods other than
      * property getters/setters and life cycle methods of this component. This
      * method should be called before any of the public methods other than
@@ -243,6 +252,9 @@ public interface Lifecycle {
 
 
     /**
+     * 使组件停止工作，先后会发出以下事件：BEFORE_STOP_EVENT、STOP_EVENT、AFTER_STOP_EVENT
+     * 一旦触发 STOP_EVENT ，就不应使用除属性获取方法和生命周期方法以外的公共方法
+     *
      * Gracefully terminate the active use of the public methods other than
      * property getters/setters and life cycle methods of this component. Once
      * the STOP_EVENT is fired, the public methods other than property
@@ -276,6 +288,8 @@ public interface Lifecycle {
     public void stop() throws LifecycleException;
 
     /**
+     * 销毁组件时被调用
+     *
      * Prepare to discard the object. The following {@link LifecycleEvent}s will
      * be fired in the following order:
      * <ol>
@@ -290,6 +304,8 @@ public interface Lifecycle {
 
 
     /**
+     * 组件状态
+     *
      * Obtain the current state of the source component.
      *
      * @return The current state of the source component.
@@ -298,6 +314,8 @@ public interface Lifecycle {
 
 
     /**
+     * 获取state的文字说明
+     *
      * Obtain a textual representation of the current component state. Useful
      * for JMX. The format of this string may vary between point releases and
      * should not be relied upon to determine component state. To determine
@@ -309,6 +327,8 @@ public interface Lifecycle {
 
 
     /**
+     * 标记接口用于指示该实例只能使用一次
+     *
      * Marker interface used to indicate that the instance should only be used
      * once. Calling {@link #stop()} on an instance that supports this interface
      * will automatically call {@link #destroy()} after {@link #stop()}

@@ -1003,6 +1003,7 @@ public class Connector extends LifecycleMBeanBase  {
     @Override
     protected void initInternal() throws LifecycleException {
 
+        // 先行调用LifecycleMBeanBase的initInternal，保证jmx的正常注册和注销
         super.initInternal();
 
         if (protocolHandler == null) {
