@@ -269,7 +269,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * The number of threads available to process start and stop events for any
      * children associated with this container.
      */
+    // 默认是1个线程
     private int startStopThreads = 1;
+
+    //作用： 1.在start的时候，如果发现有子容器，则会把子容器的start操作放在线程池中进行处理
+    //      2.在stop的时候，也会把stop操作放在线程池中处理
     protected ExecutorService startStopExecutor;
 
 
@@ -903,6 +907,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Start our child containers, if any
+        // 把子容器的启动步骤放在线程中处理，默认情况下线程池只有一个线程处理任务队列
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
@@ -911,6 +916,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         MultiThrowable multiThrowable = null;
 
+        // 阻塞当前线程，直到子容器start完成
         for (Future<Void> result : results) {
             try {
                 result.get();
@@ -929,6 +935,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Start the Valves in our pipeline (including the basic), if any
+        // 启用Pipeline
         if (pipeline instanceof Lifecycle) {
             ((Lifecycle) pipeline).start();
         }
@@ -936,6 +943,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         setState(LifecycleState.STARTING);
 
         // Start our thread
+        // 开启ContainerBackgroundProcessor线程用于调用子容器的backgroundProcess方法，默认情况下backgroundProcessorDelay=-1，不会启用该线程
         if (backgroundProcessorDelay > 0) {
             monitorFuture = Container.getService(ContainerBase.this).getServer()
                     .getUtilityExecutor().scheduleWithFixedDelay(

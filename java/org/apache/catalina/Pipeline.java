@@ -19,6 +19,9 @@ package org.apache.catalina;
 import java.util.Set;
 
 /**
+ * Pipeline是管道组件，用于封装了一组有序的Valve，便于Valve顺序地传递或者处理请求
+ * Valve 是阀门组件，穿插在 Container 容器中，可以把它理解成请求拦截器，在 tomcat 接收到网络请求与触发 Servlet 之间执行
+ *
  * <p>Interface describing a collection of Valves that should be executed
  * in sequence when the <code>invoke()</code> method is invoked.  It is
  * required that a Valve somewhere in the pipeline (usually the last one)

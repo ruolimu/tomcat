@@ -1260,6 +1260,7 @@ public class ContextConfig implements LifecycleListener {
          *   those in JARs excluded from an absolute ordering) need to be
          *   scanned to check if they match.
          */
+        // 创建 WebXml实例，并解析 web.xml 文件，会把文件中定义的 Servlet、Filter、Listener 注册到 WebXml 实例中
         WebXmlParser webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
                 context.getXmlValidation(), context.getXmlBlockExternal());
 

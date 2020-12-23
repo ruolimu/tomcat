@@ -919,9 +919,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     @Override
     protected void startInternal() throws LifecycleException {
 
+        // 先是由LifecycleBase统一发出STARTING_PREP事件，StandardServer额外还会发出CONFIGURE_START_EVENT、STARTING事件，
+        // 用于通知LifecycleListener在启动前做一些准备工作，比如NamingContextListener会处理CONFIGURE_START_EVENT事件，
+        // 实例化tomcat相关的上下文，以及ContextResource资源
         fireLifecycleEvent(CONFIGURE_START_EVENT, null);
         setState(LifecycleState.STARTING);
 
+        // NamingResourcesImpl 这个类封装了各种各样的数据，比如ContextEnvironment、ContextResource、Container等等，
+        // 它用于Resource资源的初始化，以及为webapp应用提供相关的数据资源，比如 JNDI 数据源(对应ContextResource)
         globalNamingResources.start();
 
         // Start our defined Services
@@ -1004,14 +1009,18 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Note although the cache is global, if there are multiple Servers
         // present in the JVM (may happen when embedding) then the same cache
         // will be registered under multiple names
+        // 往jmx中注册全局的 String cache，尽管这个 cache 是全局的，但是如果在同一个 jvm 中存在多个 Server，
+        // 那么则会注册多个不同名字的 StringCache，这种情况在内嵌的 tomcat 中可能会出现
         onameStringCache = register(new StringCache(), "type=StringCache");
 
         // Register the MBeanFactory
+        // 注册 MBeanFactory，用来管理 Server
         MBeanFactory factory = new MBeanFactory();
         factory.setContainer(this);
         onameMBeanFactory = register(factory, "type=MBeanFactory");
 
         // Register the naming resources
+        // 往 jmx 中注册全局的 NamingResources
         globalNamingResources.init();
 
         // Populate the extension validator with JARs from common and shared
@@ -1041,6 +1050,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
         // Initialize our defined Services
+        // 初始化内部的Service
         for (Service service : services) {
             service.init();
         }

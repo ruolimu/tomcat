@@ -192,6 +192,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Lifecycle provider.
+     *
+     * 根据 class 实例化对象，比如 Listener、Filter、Servlet 实例对象
      */
     private InstanceManager instanceManager = null;
 
@@ -221,6 +223,8 @@ public class StandardContext extends ContainerBase
      * The list of instantiated application event listener objects. Note that
      * SCIs and other code may use the pluggability APIs to add listener
      * instances directly to this list before the application starts.
+     *
+     * SessionListener、ContextListner 等集合
      */
     private List<Object> applicationEventListenersList = new CopyOnWriteArrayList<>();
 
@@ -291,6 +295,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * The ServletContext implementation associated with this Context.
+     *
+     * ServletContext上下文
      */
     protected ApplicationContext context = null;
 
@@ -374,6 +380,8 @@ public class StandardContext extends ContainerBase
     /**
      * The set of filter configurations (and associated filter instances) we
      * have initialized, keyed by filter name.
+     *
+     * filer 名字与 FilterConfig 的映射关系
      */
     private Map<String, ApplicationFilterConfig> filterConfigs = new HashMap<>();
 
@@ -401,8 +409,13 @@ public class StandardContext extends ContainerBase
 
     /**
      * The Loader implementation with which this Container is associated.
+     *
+     * 用于加载class等资源
      */
     private Loader loader = null;
+    /**
+     * 用于对loader的读写操作
+     */
     private final ReadWriteLock loaderLock = new ReentrantReadWriteLock();
 
 
@@ -414,8 +427,13 @@ public class StandardContext extends ContainerBase
 
     /**
      * The Manager implementation with which this Container is associated.
+     *
+     * Session管理器
      */
     protected Manager manager = null;
+    /**
+     * 用于对manager的读写操作
+     */
     private final ReadWriteLock managerLock = new ReentrantReadWriteLock();
 
 
@@ -528,6 +546,8 @@ public class StandardContext extends ContainerBase
     /**
      * The servlet mappings for this web application, keyed by
      * matching pattern.
+     *
+     * url与Servlet名字的映射关系
      */
     private Map<String, String> servletMappings = new HashMap<>();
 
@@ -693,6 +713,8 @@ public class StandardContext extends ContainerBase
     /**
      * The Jar scanner to use to search for Jars that might contain
      * configuration information such as TLDs or web-fragment.xml files.
+     *
+     * 用于扫描jar包资源
      */
     private JarScanner jarScanner = null;
 
@@ -805,6 +827,7 @@ public class StandardContext extends ContainerBase
 
     private final Object namingToken = new Object();
 
+    // cookies处理器，默认使用Rfc6265CookieProcessor
     private CookieProcessor cookieProcessor;
 
     private boolean validateClientProvidedNewSessionId = true;

@@ -136,6 +136,12 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
 
+    /**
+     * 考虑到有其它线程可能会改变StandardServer的state值，比如利用jmx执行init操作，因此要考虑并发问题，
+     * 所以LifecycleBase#init()使用了synchronized锁，并且state是volatile修饰的
+     *
+     * @throws LifecycleException
+     */
     @Override
     public final synchronized void init() throws LifecycleException {
         if (!state.equals(LifecycleState.NEW)) {

@@ -429,21 +429,25 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         setState(LifecycleState.STARTING);
 
         // Start our defined Container first
+        // 启动Engine，Engine的child容器都会被启动，webapp的部署会在这个步骤完成
         if (engine != null) {
             synchronized (engine) {
                 engine.start();
             }
         }
 
+        // 启动Executor，这是tomcat用Lifecycle封装的线程池，继承至java.util.concurrent.Executor以及tomcat的Lifecycle接口
         synchronized (executors) {
             for (Executor executor: executors) {
                 executor.start();
             }
         }
 
+        // 启动MapperListener
         mapperListener.start();
 
         // Start our defined Connectors second
+        // 启动Connector
         synchronized (connectorsLock) {
             for (Connector connector: connectors) {
                 // If it has already failed, don't try and start it
@@ -535,13 +539,17 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void initInternal() throws LifecycleException {
 
+        // 往jmx中注册自己
         super.initInternal();
 
+        // 初始化Engine，而Engine初始化过程中会去初始化 Realm(权限相关的组件)
         if (engine != null) {
             engine.init();
         }
 
         // Initialize any Executors
+        // 存在 Executor 线程池，则进行初始化，默认是没有的
+        // 注意是 org.apache.catalina.Executor 接口 extends java.util.concurrent.Executor,org.apache.catalina.Lifecycle
         for (Executor executor : findExecutors()) {
             if (executor instanceof JmxEnabled) {
                 ((JmxEnabled) executor).setDomain(getDomain());
@@ -553,6 +561,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         mapperListener.init();
 
         // Initialize our defined Connectors
+        // 初始化 Connector 连接器，默认有http1.1、ajp连接器，而 Connector 又会对 ProtocolHandler 进行初始化，开启应用端口的监听
         synchronized (connectorsLock) {
             for (Connector connector : connectors) {
                 connector.init();

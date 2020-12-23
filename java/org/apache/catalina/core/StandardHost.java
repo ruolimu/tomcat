@@ -816,10 +816,12 @@ public class StandardHost extends ContainerBase implements Host {
     protected synchronized void startInternal() throws LifecycleException {
 
         // Set error report valve
+        // errorValve默认使用org.apache.catalina.valves.ErrorReportValve
         String errorValve = getErrorReportValveClass();
         if ((errorValve != null) && (!errorValve.equals(""))) {
             try {
                 boolean found = false;
+                // 如果所有的阀门中已经存在这个实例，则不进行处理，否则添加到 Pipeline 中
                 Valve[] valves = getPipeline().getValves();
                 for (Valve valve : valves) {
                     if (errorValve.equals(valve.getClass().getName())) {
@@ -827,6 +829,8 @@ public class StandardHost extends ContainerBase implements Host {
                         break;
                     }
                 }
+                // 如果未找到则添加到 Pipeline 中，注意是添加到 basic valve 的前面
+                // 默认情况下，first valve 是 AccessLogValve，basic 是 StandardHostValve
                 if(!found) {
                     Valve valve = ErrorReportValve.class.getName().equals(errorValve) ?
                         new ErrorReportValve() :
@@ -840,6 +844,7 @@ public class StandardHost extends ContainerBase implements Host {
                         errorValve), t);
             }
         }
+        // 调用父类 ContainerBase，完成统一的启动动作
         super.startInternal();
     }
 

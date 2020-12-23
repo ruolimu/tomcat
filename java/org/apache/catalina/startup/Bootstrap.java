@@ -248,6 +248,7 @@ public final class Bootstrap {
      */
     public void init() throws Exception {
 
+        // 初始化 commonLoader、catalinaLoader、sharedLoader
         initClassLoaders();
 
         Thread.currentThread().setContextClassLoader(catalinaLoader);
@@ -257,12 +258,14 @@ public final class Bootstrap {
         // Load our startup class and call its process() method
         if (log.isDebugEnabled())
             log.debug("Loading startup class");
+        // 反射方法实例化 Catalina
         Class<?> startupClass = catalinaLoader.loadClass("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.getConstructor().newInstance();
 
         // Set the shared extensions class loader
         if (log.isDebugEnabled())
             log.debug("Setting startup class properties");
+        // 反射调用 setParentClassLoader 方法，设置其 parentClassLoader为sharedLoader
         String methodName = "setParentClassLoader";
         Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
@@ -272,6 +275,7 @@ public final class Bootstrap {
             startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
 
+        // 引用 Catalina 实例
         catalinaDaemon = startupInstance;
     }
 
@@ -468,8 +472,11 @@ public final class Bootstrap {
                 args[args.length - 1] = "stop";
                 daemon.stop();
             } else if (command.equals("start")) {
+                // 让tomcat在关闭端口阻塞监听关闭命令，参考 Catalina.await()
                 daemon.setAwait(true);
+                // 调用Catalina#load(args)方法，会去初始化一些资源，优先加载conf/server.xml，找不到再去加载server-embed.xml；此外，load方法还会初始化Server
                 daemon.load(args);
+                // 调用Catalina.start()
                 daemon.start();
                 if (null == daemon.getServer()) {
                     System.exit(1);

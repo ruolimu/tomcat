@@ -286,6 +286,8 @@ public class HostConfig implements LifecycleListener {
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
+        // 判断事件是否由 Host 发出，并且为 HostConfig 设置属性
+
         // Identify the host we are associated with
         try {
             host = (Host) event.getLifecycle();
@@ -420,12 +422,19 @@ public class HostConfig implements LifecycleListener {
 
         File appBase = host.getAppBaseFile();
         File configBase = host.getConfigBaseFile();
+        // 过滤出 webapp 要部署应用的目录
         String[] filteredAppPaths = filterAppPaths(appBase.list());
+
         // Deploy XML descriptors from configBase
+        // 部署 xml 描述文件
         deployDescriptors(configBase, configBase.list());
+
         // Deploy WARs
         deployWARs(appBase, filteredAppPaths);
+        // 解压 war 包，但是这里还不会去启动应用
+
         // Deploy expanded folders
+        // 处理已经存在的目录，前面解压的 war 包不会再行处理
         deployDirectories(appBase, filteredAppPaths);
 
     }
@@ -1073,6 +1082,7 @@ public class HostConfig implements LifecycleListener {
                     dir.getAbsolutePath()));
         }
 
+        // 实例化 StandardContext
         Context context = null;
         File xml = new File(dir, Constants.ApplicationContextXml);
         File xmlCopy =
@@ -1122,6 +1132,7 @@ public class HostConfig implements LifecycleListener {
                 context = (Context) Class.forName(contextClass).getConstructor().newInstance();
             }
 
+            // 实例化 ContextConfig，作为 LifecycleListener 添加到 Context 容器中，这和 StandardHost 的套路一样，都是使用 XXXConfig
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
             context.addLifecycleListener(listener);
@@ -1130,6 +1141,8 @@ public class HostConfig implements LifecycleListener {
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName());
+
+            // 实例化 Context 之后，为 Host 添加子容器
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

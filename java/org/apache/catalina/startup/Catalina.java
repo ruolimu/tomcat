@@ -725,9 +725,11 @@ public class Catalina {
 
         long t1 = System.nanoTime();
 
+        // 初始化jmx的环境变量
         // Before digester - it may be needed
         initNaming();
 
+        // 定义解析server.xml的配置，告诉Digester哪个xml标签应该解析成什么类
         // Parse main server.xml
         parseServerXml(true);
         Server s = getServer();
@@ -735,6 +737,7 @@ public class Catalina {
             return;
         }
 
+        // 给Server设置catalina信息
         getServer().setCatalina(this);
         getServer().setCatalinaHome(Bootstrap.getCatalinaHomeFile());
         getServer().setCatalinaBase(Bootstrap.getCatalinaBaseFile());
@@ -813,6 +816,7 @@ public class Catalina {
         }
 
         // Register shutdown hook
+        // 注册勾子，用于安全关闭 tomcat
         if (useShutdownHook) {
             if (shutdownHook == null) {
                 shutdownHook = new CatalinaShutdownHook();
@@ -829,6 +833,7 @@ public class Catalina {
             }
         }
 
+        // Bootstrap 中会设置 await 为 true，其目的在于让 tomcat 在 shutdown 端口阻塞监听关闭命令
         if (await) {
             await();
             stop();

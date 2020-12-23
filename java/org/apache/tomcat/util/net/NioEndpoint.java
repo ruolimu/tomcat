@@ -153,10 +153,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     @Override
     public void bind() throws Exception {
+        // 实例化 ServerSocketChannel，并且绑定端口和地址
         initServerSocket();
 
         setStopLatch(new CountDownLatch(1));
 
+        // 如果有必要的话初始化 ssl
         // Initialize SSL if needed
         initialiseSsl();
     }

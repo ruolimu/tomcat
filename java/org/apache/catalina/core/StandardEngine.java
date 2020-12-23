@@ -238,6 +238,8 @@ public class StandardEngine extends ContainerBase implements Engine {
     protected void initInternal() throws LifecycleException {
         // Ensure that a Realm is present before any attempt is made to start
         // one. This will create the default NullRealm if necessary.
+        // Realm(域)是用于对单个用户进行身份验证的底层安全领域的只读外观，并标识与这些用户相关联的安全角色。
+        // 域可以在任何容器级别上附加，但是通常只附加到Context，或者更高级别的容器。
         getRealm();
         super.initInternal();
     }
